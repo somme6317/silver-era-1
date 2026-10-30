@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Κεεη  FX — Professional Currency Matrix & Converter</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chart.js for FX Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom Stylesheet link (if using external CSS) -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="min-h-screen flex flex-col selection:bg-yellow-500 selection:text-black">
+
+    <!-- LIVE TICKER BANNER -->
+    <div class="bg-gray-950/90 border-b border-yellow-500/20 py-2.5 overflow-hidden text-xs font-mono">
+        <div class="animate-ticker whitespace-nowrap flex items-center space-x-8 text-gray-400">
+            <div class="flex items-center space-x-2"><span class="text-yellow-500 font-bold">USD/EUR</span> <span>0.9245</span> <span class="text-emerald-400">+0.12%</span></div>
+            <div class="flex items-center space-x-2"><span class="text-yellow-500 font-bold">GBP/USD</span> <span>1.2780</span> <span class="text-emerald-400">+0.34%</span></div>
+            <div class="flex items-center space-x-2"><span class="text-yellow-500 font-bold">USD/JPY</span> <span>155.42</span> <span class="text-rose-400">-0.18%</span></div>
+            <div class="flex items-center space-x-2"><span class="text-yellow-500 font-bold">EUR/GBP</span> <span>0.8560</span> <span class="text-emerald-400">+0.05%</span></div>
+            <div class="flex items-center space-x-2"><span class="text-yellow-500 font-bold">AUD/USD</span> <span>0.6540</span> <span class="text-rose-400">-0.21%</span></div>
+            <div class="flex items-center space-x-2"><span class="text-yellow-500 font-bold">USD/CAD</span> <span>1.3650</span> <span class="text-emerald-400">+0.09%</span></div>
+            <div class="flex items-center space-x-2"><span class="text-yellow-500 font-bold">USD/NGN</span> <span>1,450.00</span> <span class="text-emerald-400">+1.15%</span></div>
+            <!-- Duplicate for infinite seamless scroll -->
+            <div class="flex items-center space-x-2"><span class="text-yellow-500 font-bold">USD/EUR</span> <span>0.9245</span> <span class="text-emerald-400">+0.12%</span></div>
+            <div class="flex items-center space-x-2"><span class="text-yellow-500 font-bold">GBP/USD</span> <span>1.2780</span> <span class="text-emerald-400">+0.34%</span></div>
+            <div class="flex items-center space-x-2"><span class="text-yellow-500 font-bold">USD/JPY</span> <span>155.42</span> <span class="text-rose-400">-0.18%</span></div>
+        </div>
+    </div>
+
+    <!-- HEADER NAVIGATION -->
+    <header class="border-b border-gray-800/60 bg-gray-900/50 backdrop-blur-xl sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-yellow-300 via-yellow-500 to-amber-700 flex items-center justify-center shadow-lg shadow-yellow-500/20">
+                    <i class="fa-solid fa-gem text-gray-950 text-lg"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold tracking-wider gold-gradient-text">KEEN FX</span>
+                    <span class="block text-[10px] text-gray-400 uppercase tracking-widest font-mono">Terminal v2.5</span>
+                </div>
+            </div>
+            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium text-gray-300">
+                <a href="#converter" class="hover:text-yellow-400 transition-colors flex items-center space-x-1.5"><i class="fa-solid fa-calculator text-xs text-yellow-500"></i><span>Converter</span></a>
+                <a href="#analytics" class="hover:text-yellow-400 transition-colors flex items-center space-x-1.5"><i class="fa-solid fa-chart-line text-xs text-yellow-500"></i><span>Market Chart</span></a>
+                <a href="#matrix" class="hover:text-yellow-400 transition-colors flex items-center space-x-1.5"><i class="fa-solid fa-table-cells text-xs text-yellow-500"></i><span>Rate Matrix</span></a>
+            </nav>
+            <div class="flex items-center space-x-4">
+                <div class="hidden sm:flex items-center space-x-2 text-xs font-mono bg-gray-800/80 px-3 py-1.5 rounded-full border border-gray-700 text-yellow-400">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="live-status">API Live Feed</span>
+                </div>
+                <button onclick="triggerQuickSwapToast()" class="gold-btn px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider shadow-md">
+                    <i class="fa-solid fa-bolt mr-1.5"></i> Quick Rate
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+        <!-- LEFT COLUMN: CONVERTER PANEL & FEE CALCULATOR (7 Cols) -->
+        <section id="converter" class="lg:col-span-7 space-y-8">
+            
+            <!-- Hero Title Card -->
+            <div class="glass-panel p-8 rounded-3xl relative overflow-hidden shadow-2xl">
+                <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-yellow-500/5 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="max-w-xl">
+                    <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-xs font-semibold mb-4">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <span>Institutional-Grade FX Engine</span>
+                    </div>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-3">
+                        Precision Global <span class="gold-gradient-text">Currency Converter</span>
+                    </h1>
+                    <p class="text-gray-400 text-sm sm:text-base leading-relaxed">
+                        Convert fiat and digital assets instantly with live mid-market exchange rates, real-time recalculations, and advanced fee projections.
+                    </p>
+                </div>
+
+                <!-- CONVERTER INTERACTIVE CARD -->
+                <div class="mt-8 bg-gray-950/70 p-6 rounded-2xl border border-gray-800 space-y-5">
+                    
+                    <!-- From Amount & Currency -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-medium text-gray-400">
+                            <span>Amount to Convert</span>
+                            <span id="from-balance-label" class="font-mono text-yellow-500">Mid-market rate active</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div class="sm:col-span-7 relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 font-mono text-lg font-bold" id="from-symbol">$</div>
+                                <input type="number" id="from-amount" value="1000" min="0" step="any" 
+                                    class="w-full bg-gray-900 border border-gray-700 rounded-xl py-3.5 pl-9 pr-4 text-white font-mono text-xl focus:outline-none gold-border-glow transition-all"
+                                    placeholder="0.00">
+                            </div>
+                            <div class="sm:col-span-5">
+                                <select id="from-currency" class="w-full bg-gray-900 border border-gray-700 rounded-xl py-3.5 px-4 text-white font-semibold focus:outline-none gold-border-glow transition-all cursor-pointer">
+                                    <!-- Populated via JS -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Swap Button Divider -->
+                    <div class="flex justify-center relative my-1">
+                        <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-gray-800"></div></div>
+                        <button id="swap-btn" title="Swap Currencies" class="relative z-10 w-12 h-12 rounded-2xl bg-gray-900 border border-gray-700 text-yellow-400 flex items-center justify-center hover:bg-yellow-500 hover:text-gray-950 hover:border-yellow-500 transition-all shadow-lg group">
+                            <i class="fa-solid fa-arrow-right-arrow-left text-sm group-hover:rotate-180 transition-transform duration-500"></i>
+                        </button>
+                    </div>
+
+                    <!-- To Amount & Currency -->
+                    <div class="space-y-2">
+                        <div class="flex justify-between text-xs font-medium text-gray-400">
+                            <span>Converted Amount</span>
+                            <span class="font-mono text-emerald-400">Zero Slippage</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3">
+                            <div class="sm:col-span-7 relative">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-gray-500 font-mono text-lg font-bold" id="to-symbol">€</div>
+                                <input type="text" id="to-amount" readonly 
+                                    class="w-full bg-gray-900/60 border border-gray-800 rounded-xl py-3.5 pl-9 pr-4 text-yellow-400 font-mono text-xl font-bold focus:outline-none cursor-default"
+                                    placeholder="0.00">
+                            </div>
+                            <div class="sm:col-span-5">
+                                <select id="to-currency" class="w-full bg-gray-900 border border-gray-700 rounded-xl py-3.5 px-4 text-white font-semibold focus:outline-none gold-border-glow transition-all cursor-pointer">
+                                    <!-- Populated via JS -->
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Conversion Summary Pill -->
+                    <div class="pt-2 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-400 border-t border-gray-900 gap-2">
+                        <div>
+                            <span class="text-gray-500">Exchange Rate:</span>
+                            <span id="rate-display" class="font-mono text-white ml-1 font-semibold">1 USD = 0.9245 EUR</span>
+                        </div>
+                        <div class="flex items-center space-x-1 text-yellow-500/90">
+                            <i class="fa-regular fa-clock"></i>
+                            <span id="update-time">Updated just now</span>
+                        </div>
+                    </div>
+
+                    <!-- Convert Action Button -->
+                    <button id="convert-action-btn" class="w-full py-4 rounded-xl font-bold uppercase tracking-wider text-sm gold-btn shadow-lg flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-calculator"></i>
+                        <span>Calculate Full Breakdown</span>
+                    </button>
+
+                </div>
+            </div>
+
+            <!-- FEE CALCULATOR WIDGET -->
+            <div class="glass-panel p-6 rounded-3xl space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-receipt text-yellow-500"></i>
+                        <span>Transfer Fee & Net Calculator</span>
+                    </h3>
+                    <span class="text-xs font-mono bg-gray-800 px-2.5 py-1 rounded-md text-gray-300">Optional</span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1.5">Transfer Fee Structure</label>
+                        <select id="fee-type" class="w-full bg-gray-900 border border-gray-700 rounded-xl py-2.5 px-3 text-sm text-white focus:outline-none gold-border-glow">
+                            <option value="percentage">Percentage (1.5%)</option>
+                            <option value="flat">Flat Fee ($5.00)</option>
+                            <option value="none">Zero Fee (VIP tier)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-400 mb-1.5">Recipient Receives Net</label>
+                        <div class="bg-gray-900 border border-gray-700 rounded-xl py-2.5 px-3 text-sm font-mono text-emerald-400 font-bold flex items-center justify-between">
+                            <span id="net-amount-display">0.00</span>
+                            <span id="net-currency-symbol" class="text-xs text-gray-400">EUR</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- RIGHT COLUMN: ANALYTICS CHART & QUICK MATRIX (5 Cols) -->
+        <section id="analytics" class="lg:col-span-5 space-y-8">
+            
+            <!-- FX CHART CARD -->
+            <div class="glass-panel p-6 rounded-3xl space-y-6 shadow-2xl">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-white flex items-center space-x-2">
+                            <i class="fa-solid fa-chart-line text-yellow-500"></i>
+                            <span>Market Trend Analysis</span>
+                        </h3>
+                        <p class="text-xs text-gray-400 font-mono mt-0.5" id="chart-subtitle">Historical spread for USD/EUR</p>
+                    </div>
+                    <div class="flex bg-gray-900 p-1 rounded-xl border border-gray-800 text-xs font-semibold">
+                        <button onclick="updateChartTimeframe('1W')" class="px-3 py-1 rounded-lg text-gray-400 hover:text-white transition-all tf-btn" data-tf="1W">1W</button>
+                        <button onclick="updateChartTimeframe('1M')" class="px-3 py-1 rounded-lg bg-yellow-500 text-gray-950 shadow-md tf-btn" data-tf="1M">1M</button>
+                        <button onclick="updateChartTimeframe('1Y')" class="px-3 py-1 rounded-lg text-gray-400 hover:text-white transition-all tf-btn" data-tf="1Y">1Y</button>
+                    </div>
+                </div>
+
+                <!-- Chart Canvas Container -->
+                <div class="relative w-full h-64">
+                    <canvas id="fxChart"></canvas>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 pt-2 border-t border-gray-800/80 text-center font-mono">
+                    <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800">
+                        <span class="block text-[10px] text-gray-500 uppercase">24h High</span>
+                        <span id="stat-high" class="text-sm font-bold text-white">0.9280</span>
+                    </div>
+                    <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800">
+                        <span class="block text-[10px] text-gray-500 uppercase">24h Low</span>
+                        <span id="stat-low" class="text-sm font-bold text-white">0.9210</span>
+                    </div>
+                    <div class="bg-gray-900/60 p-2.5 rounded-xl border border-gray-800">
+                        <span class="block text-[10px] text-gray-500 uppercase">Volatility</span>
+                        <span class="text-sm font-bold text-emerald-400">Low (0.4%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- POPULAR PAIRS QUICK MATRIX -->
+            <div id="matrix" class="glass-panel p-6 rounded-3xl space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-base font-bold text-white flex items-center space-x-2">
+                        <i class="fa-solid fa-globe text-yellow-500"></i>
+                        <span>Popular Cross Rates</span>
+                    </h3>
+                    <span class="text-xs text-gray-400 font-mono">Base: <strong id="matrix-base-label" class="text-yellow-400">USD</strong></span>
+                </div>
+
+                <div id="matrix-grid" class="grid grid-cols-2 gap-3">
+                    <!-- Dynamic Matrix Cards inserted here via JS -->
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-gray-800/60 bg-gray-950 py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-gray-400 font-mono">
+            <div class="flex items-center space-x-2">
+                <span class="w-2 h-2 rounded-full bg-yellow-500"></span>
+                <span>KEEN FX Terminal &bull; Final Capstone Web Project</span>
+            </div>
+            <div>
+                <span>Designed with Precision &bull; Powered by Open Exchange Rates API</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col space-y-3 pointer-events-none"></div>
+
+    <!-- External JavaScript link -->
+    <script src="script.js"></script>
+</body>
+</html>
